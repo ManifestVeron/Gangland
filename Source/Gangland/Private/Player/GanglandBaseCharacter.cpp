@@ -1,6 +1,7 @@
 // Gangland
 
 #include "Player/GanglandBaseCharacter.h"
+
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -35,18 +36,19 @@ void AGanglandBaseCharacter::Tick(float DeltaTime)
 void AGanglandBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	// Change control to Enhanted Player Inpute and Enhanted Pleyer Component
+	// !!Change control to Enhanted Player Inpute and Enhanted Pleyer Component!!
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGanglandBaseCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGanglandBaseCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("LookUp", this, &AGanglandBaseCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("TurnAround", this, &AGanglandBaseCharacter::AddControllerYawInput);
+	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&AGanglandBaseCharacter::Jump);
 }
-// Change Enhanted Inpute Forward
+// !!Change Enhanted Inpute Forward!!
 void AGanglandBaseCharacter::MoveForward(float Amount)
 {
 	AddMovementInput(GetActorForwardVector(), Amount);
 }
-// Change Enhanted Inpute Forward
+// !!Change Enhanted Inpute Forward!!
 void AGanglandBaseCharacter::MoveRight(float Amount)
 {
 	AddMovementInput(GetActorRightVector(), Amount);
