@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "GanglandGameModeBase.generated.h"
+#include "GGGameModeBase.generated.h"
 
 /**
  *
  */
 UCLASS()
-class GANGLAND_API AGanglandGameModeBase : public AGameModeBase
+class GANGLAND_API AGGGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	AGanglandGameModeBase();
+	AGGGameModeBase();
 };
