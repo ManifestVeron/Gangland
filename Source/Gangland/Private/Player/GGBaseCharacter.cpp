@@ -4,8 +4,10 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/GGCharacterMovementComponent.h"
+#include "Components/GGHealthComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/TextRenderComponent.h"
 
 // Sets default values
 AGGBaseCharacter::AGGBaseCharacter(const FObjectInitializer& ObjInit)
@@ -20,18 +22,29 @@ AGGBaseCharacter::AGGBaseCharacter(const FObjectInitializer& ObjInit)
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	HealthComponent = CreateDefaultSubobject<UGGHealthComponent>("HealthComponent");
+
+	HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextComponent");
+	HealthTextComponent->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
 void AGGBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	check(HealthComponent);
+	check(HealthTextComponent);
 }
 
 // Called every frame
 void AGGBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	const auto Health = HealthComponent->GetHealth();
+	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"),Health)));
 }
 
 // Called to bind functionality to input
@@ -81,6 +94,8 @@ bool AGGBaseCharacter::IsRunning() const
 	return WantsToRun && IsMovingForward && !GetVelocity().IsZero();
 }
 
+// !!Change control to Enhanted Player Inpute and Enhanted Pleyer Component!! //
+
 float AGGBaseCharacter::GetMovementDirection() const
 {
 	if (GetVelocity().IsZero())
@@ -96,5 +111,3 @@ float AGGBaseCharacter::GetMovementDirection() const
 
 	return CrossProduct.IsZero() ? Degress : Degress * FMath::Sign(CrossProduct.Z);
 }
-
-// !!Change control to Enhanted Player Inpute and Enhanted Pleyer Component!! //
