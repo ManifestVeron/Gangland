@@ -6,8 +6,8 @@
 #include "Components/GGCharacterMovementComponent.h"
 #include "Components/GGHealthComponent.h"
 #include "Components/InputComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
 AGGBaseCharacter::AGGBaseCharacter(const FObjectInitializer& ObjInit)
@@ -36,6 +36,7 @@ void AGGBaseCharacter::BeginPlay()
 
 	check(HealthComponent);
 	check(HealthTextComponent);
+
 }
 
 // Called every frame
@@ -44,7 +45,9 @@ void AGGBaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	const auto Health = HealthComponent->GetHealth();
-	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"),Health)));
+	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+
+	TakeDamage(0.1f, FDamageEvent{}, Controller, this);
 }
 
 // Called to bind functionality to input
@@ -89,6 +92,7 @@ void AGGBaseCharacter::OnStopRunning()
 {
 	WantsToRun = false;
 }
+
 bool AGGBaseCharacter::IsRunning() const
 {
 	return WantsToRun && IsMovingForward && !GetVelocity().IsZero();

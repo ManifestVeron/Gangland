@@ -1,7 +1,10 @@
 // Gangland
 
-
 #include "Components/GGHealthComponent.h"
+
+#include "GameFramework/Actor.h"
+
+DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
 
 // Sets default values for this component's properties
 UGGHealthComponent::UGGHealthComponent()
@@ -9,10 +12,7 @@ UGGHealthComponent::UGGHealthComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// ...
 }
-
 
 // Called when the game starts
 void UGGHealthComponent::BeginPlay()
@@ -20,6 +20,16 @@ void UGGHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Health = MaxHealth;
-	
+
+	AActor* ComponentOwner = GetOwner();
+	if (ComponentOwner)
+	{
+		ComponentOwner->OnTakeAnyDamage.AddDynamic(this, &UGGHealthComponent::OnTakeAnyDamage);
+	}
 }
 
+void UGGHealthComponent::OnTakeAnyDamage(
+	AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+	Health -= Damage;
+}
