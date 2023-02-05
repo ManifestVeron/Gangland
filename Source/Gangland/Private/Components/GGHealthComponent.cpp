@@ -1,10 +1,11 @@
 // Gangland
 
 #include "Components/GGHealthComponent.h"
-
 #include "GameFramework/Actor.h"
+#include "Dev/GGFireDamageType.h"
+#include "Dev/GGIceDamageType.h"
 
-DEFINE_LOG_CATEGORY_STATIC(BaseCharacterLog, All, All);
+DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All);
 
 // Sets default values for this component's properties
 UGGHealthComponent::UGGHealthComponent()
@@ -32,4 +33,17 @@ void UGGHealthComponent::OnTakeAnyDamage(
 	AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
 	Health -= Damage;
+	UE_LOG(LogHealthComponent, Display, TEXT("Damage : %f"), Damage);
+
+	if (DamageType)
+	{
+		if (DamageType->IsA<UGGFireDamageType>())
+		{
+			UE_LOG(LogHealthComponent, Display, TEXT("Soooooo hoooooot"));
+		}
+		else if (DamageType->IsA<UGGIceDamageType>())
+		{
+			UE_LOG(LogHealthComponent, Display, TEXT("Soooooo cooooold"));
+		}
+	}
 }

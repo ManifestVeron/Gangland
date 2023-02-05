@@ -24,7 +24,8 @@ public class Gangland : ModuleRules
         PublicIncludePaths.AddRange(new string[]
         {
             "Gangland/Public/Player",
-            "Gangland/Public/Components"
+            "Gangland/Public/Components",
+            "Gangland/Public/Dev"
         });
 
         // Uncomment if you are using Slate UI
