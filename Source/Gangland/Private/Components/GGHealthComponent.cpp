@@ -1,7 +1,6 @@
 // Gangland
 
 #include "Components/GGHealthComponent.h"
-
 #include "GameFramework/Actor.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All);
@@ -19,7 +18,7 @@ void UGGHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Health = MaxHealth;
+	SetHealth(MaxHealth);
 	OnHealthChanged.Broadcast(Health);
 
 	AActor* ComponentOwner = GetOwner();
@@ -29,19 +28,46 @@ void UGGHealthComponent::BeginPlay()
 	}
 }
 
-void UGGHealthComponent::OnTakeAnyDamage(
-	AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+void UGGHealthComponent::OnTakeAnyDamage
+(
+	AActor* DamagedActor,
+	float Damage,
+	const class UDamageType* DamageType,
+	class AController* InstigatedBy,
+	AActor* DamageCauser
+	)
 {
-	if (Damage <= 0.0f || IsDead())
+	if (Damage <= 0.0f || IsDead() ||  !GetWorld())
 	{
 		return;
 	}
 
-	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
-	OnHealthChanged.Broadcast(Health);
+	SetHealth(Health - Damage);
 
+	GetWorld()->GetTimerManager().ClearTimer(HealTimeHandle);
+	
 	if (IsDead())
 	{
 		OnDeath.Broadcast();
 	}
+	else if (AutoHeal)
+	{
+		GetWorld()->GetTimerManager().SetTimer(HealTimeHandle,this, &UGGHealthComponent::HealUpdate,HealUpdateTime,true,HealDelay);
+	}
+}
+
+void UGGHealthComponent::HealUpdate()
+{
+	SetHealth(Health + HealModifier);
+	
+	if( FMath::IsNearlyEqual(Health,MaxHealth) && GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(HealTimeHandle);
+	}
+}
+
+void UGGHealthComponent::SetHealth(float NewHealth)
+{
+	Health = FMath::Clamp(NewHealth, 0.0f , MaxHealth);
+	OnHealthChanged.Broadcast(Health);
 }
