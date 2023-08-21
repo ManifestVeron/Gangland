@@ -7,6 +7,7 @@
 #include "Components/GGHealthComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
 
@@ -44,6 +45,8 @@ void AGGBaseCharacter::BeginPlay()
 	OnHealthChanged(HealthComponent->GetHealth());
 	HealthComponent->OnDeath.AddUObject(this, &AGGBaseCharacter::OnDeath);
 	HealthComponent->OnHealthChanged.AddUObject(this, &AGGBaseCharacter::OnHealthChanged);
+
+	LandedDelegate.AddDynamic(this, &AGGBaseCharacter::OnGroundeLanded);
 }
 
 // Called every frame
@@ -137,4 +140,19 @@ void AGGBaseCharacter::OnDeath()
 void AGGBaseCharacter::OnHealthChanged(float Health)
 {
 	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+}
+
+void AGGBaseCharacter::OnGroundeLanded(const FHitResult& Hit)
+{
+	const auto FallVelocityZ = -GetCharacterMovement()->Velocity.Z;
+	UE_LOG(LogBaseCharacter, Display, TEXT("On landed %f"), FallVelocityZ);
+
+	if(FallVelocityZ < LandedDamageVelocity.X)
+	{
+		return;
+	}
+
+	const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
+	UE_LOG(LogBaseCharacter, Display, TEXT("On landed %f"), FinalDamage);
+	TakeDamage(FinalDamage, FDamageEvent(), nullptr, nullptr);
 }

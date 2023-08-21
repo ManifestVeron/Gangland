@@ -70,6 +70,7 @@ Latest commit fcb1dbf on Jun 18, 2018
 *.sdf
 *.VC.db
 *.VC.opendb
+*.vsconfig
 
 # Precompiled Assets
 SourceArt/**/*.png
@@ -78,6 +79,7 @@ SourceArt/**/*.tga
 # Binary Files
 *.idea/*
 Binaries/*
+Platforms/*
 Plugins/*/Binaries/*
 
 # Builds
