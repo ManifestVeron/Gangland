@@ -129,7 +129,7 @@ void AGGBaseCharacter::OnDeath()
 
 	GetCharacterMovement()->DisableMovement();
 
-	SetLifeSpan(5.0f);
+	SetLifeSpan(LifeSpanOnDeath);
 	
 	if (Controller)
 	{
@@ -144,15 +144,17 @@ void AGGBaseCharacter::OnHealthChanged(float Health)
 
 void AGGBaseCharacter::OnGroundeLanded(const FHitResult& Hit)
 {
-	const auto FallVelocityZ = -GetCharacterMovement()->Velocity.Z;
-	UE_LOG(LogBaseCharacter, Display, TEXT("On landed %f"), FallVelocityZ);
+	const auto FallVelocityZ = -GetVelocity().Z;
+	//UE_LOG(LogBaseCharacter, Display, TEXT("On landed %f"), FallVelocityZ);
 
 	if(FallVelocityZ < LandedDamageVelocity.X)
 	{
 		return;
 	}
 
-	const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
-	UE_LOG(LogBaseCharacter, Display, TEXT("On landed %f"), FinalDamage);
-	TakeDamage(FinalDamage, FDamageEvent(), nullptr, nullptr);
+	const auto FallDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
+	
+	TakeDamage(FallDamage, FDamageEvent(), nullptr, nullptr);
+
+	UE_LOG(LogBaseCharacter, Display, TEXT("Player %s recived landed damage %f"), *GetName(), FallDamage);
 }
