@@ -1,7 +1,7 @@
 // Gangland
 
 #include "Components/GGHealthComponent.h"
-
+#include "Net/UnrealNetwork.h"
 #include "GameFramework/Actor.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All);
@@ -16,14 +16,13 @@ UGGHealthComponent::UGGHealthComponent()
 
 	SetIsReplicatedByDefault(true);
 	//SetIsReplicated(true);
+	
 }
 
 // Called when the game starts
 void UGGHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GetOwnerRole() == ROLE_Authority)
-	{
 		SetHealth(MaxHealth);
 
 		AActor* ComponentOwner = GetOwner();
@@ -31,7 +30,6 @@ void UGGHealthComponent::BeginPlay()
 		{
 			ComponentOwner->OnTakeAnyDamage.AddDynamic(this, &UGGHealthComponent::OnTakeDamage);
 		}
-	}
 }
 
 void UGGHealthComponent::OnTakeDamage
@@ -79,4 +77,9 @@ void UGGHealthComponent::SetHealth(float NewHealth)
 		OnHealthChangedEvent.Broadcast(Health);
 		
 		UE_LOG(LogHealthComponent,Display,TEXT("Health Broadcast %f"), Health)
+}
+void UGGHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME (UGGHealthComponent, Health);
 }

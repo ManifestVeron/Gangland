@@ -10,6 +10,7 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
 
@@ -54,6 +55,8 @@ void AGGBaseCharacter::BeginPlay()
 void AGGBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//Temp Health Remove after
+	HealthTextComponent->SetText(Text);
 }
 
 // Called to bind functionality to input
@@ -137,10 +140,13 @@ void AGGBaseCharacter::OnDeath()
 			Controller->ChangeState(NAME_Spectating);
 		}
 }
-
+//Temp Health
 void AGGBaseCharacter::OnHealthChanged(float Health)
 {
-		HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+		Text = FText::FromString(FString::Printf(TEXT("%.0f"), Health));
+		//HealthTextComponent->SetText(Text);
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.5f, FColor::Red, 
+			Text.ToString());
 }
 
 void AGGBaseCharacter::OnGroundeLanded(const FHitResult& Hit)
@@ -159,3 +165,13 @@ void AGGBaseCharacter::OnGroundeLanded(const FHitResult& Hit)
 
 	UE_LOG(LogBaseCharacter, Display, TEXT("Player %s recived landed damage %f"), *GetName(), FallDamage);
 }
+
+void AGGBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	//DOREPLIFETIME (AGGBaseCharacter, HealthComponent);
+	DOREPLIFETIME (AGGBaseCharacter, HealthTextComponent);
+	DOREPLIFETIME (AGGBaseCharacter, Text);
+}
+
+  
