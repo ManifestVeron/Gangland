@@ -31,6 +31,7 @@ AGGBaseCharacter::AGGBaseCharacter(const FObjectInitializer& ObjInit)
 
 	HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextComponent");
 	HealthTextComponent->SetupAttachment(GetRootComponent());
+	
 }
 
 // Called when the game starts or when spawned
@@ -43,8 +44,8 @@ void AGGBaseCharacter::BeginPlay()
 	check(GetCharacterMovement());
 
 	OnHealthChanged(HealthComponent->GetHealth());
-	HealthComponent->OnDeath.AddUObject(this, &AGGBaseCharacter::OnDeath);
-	HealthComponent->OnHealthChanged.AddUObject(this, &AGGBaseCharacter::OnHealthChanged);
+	HealthComponent->OnDeathEvent.AddUObject(this, &AGGBaseCharacter::OnDeath);
+	HealthComponent->OnHealthChangedEvent.AddUObject(this, &AGGBaseCharacter::OnHealthChanged);
 
 	LandedDelegate.AddDynamic(this, &AGGBaseCharacter::OnGroundeLanded);
 }
@@ -123,23 +124,23 @@ float AGGBaseCharacter::GetMovementDirection() const
 
 void AGGBaseCharacter::OnDeath()
 {
-	UE_LOG(LogBaseCharacter, Display, TEXT("Player %s is dead!"), *GetName());
+		UE_LOG(LogBaseCharacter, Display, TEXT("Player %s is dead!"), *GetName());
 
-	PlayAnimMontage(DeathAnimMontage);
+		PlayAnimMontage(DeathAnimMontage);
 
-	GetCharacterMovement()->DisableMovement();
+		GetCharacterMovement()->DisableMovement();
 
-	SetLifeSpan(LifeSpanOnDeath);
+		SetLifeSpan(LifeSpanOnDeath);
 	
-	if (Controller)
-	{
-		Controller->ChangeState(NAME_Spectating);
-	}
+		if (Controller)
+		{
+			Controller->ChangeState(NAME_Spectating);
+		}
 }
 
 void AGGBaseCharacter::OnHealthChanged(float Health)
 {
-	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+		HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
 }
 
 void AGGBaseCharacter::OnGroundeLanded(const FHitResult& Hit)
