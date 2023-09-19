@@ -9,7 +9,6 @@
 #include "Components/TextRenderComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/Controller.h"
 #include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
@@ -43,7 +42,7 @@ void AGGBaseCharacter::BeginPlay()
 	check(HealthComponent);
 	check(HealthTextComponent);
 	check(GetCharacterMovement());
-
+	
 	OnHealthChanged(HealthComponent->GetHealth());
 	HealthComponent->OnDeathEvent.AddUObject(this, &AGGBaseCharacter::OnDeath);
 	HealthComponent->OnHealthChangedEvent.AddUObject(this, &AGGBaseCharacter::OnHealthChanged);
@@ -124,29 +123,36 @@ float AGGBaseCharacter::GetMovementDirection() const
 
 	return CrossProduct.IsZero() ? Degress : Degress * FMath::Sign(CrossProduct.Z);
 }
-
+UGGHealthComponent* AGGBaseCharacter::GetHealthComponent() const
+{
+	return HealthComponent;
+}
 void AGGBaseCharacter::OnDeath()
 {
-		UE_LOG(LogBaseCharacter, Display, TEXT("Player %s is dead!"), *GetName());
-
-		PlayAnimMontage(DeathAnimMontage);
-
+		bIsDead = true;
+		
 		GetCharacterMovement()->DisableMovement();
 
 		SetLifeSpan(LifeSpanOnDeath);
 	
-		if (Controller)
-		{
-			Controller->ChangeState(NAME_Spectating);
-		}
+		/* Вынести в Tools потом. Возможно ли вызывать это в Player Contoller через делегат? 
+		auto const PC = Cast<AGGPlayerController>(GetOwner());
+		if(PC) PC->OnDeath();
+		*/
 }
+//Death animations replications
+void AGGBaseCharacter::PlayAnimationDeath()
+{
+	PlayAnimMontage(DeathAnimMontage);
+}
+
 //Temp Health
 void AGGBaseCharacter::OnHealthChanged(float Health)
 {
 		Text = FText::FromString(FString::Printf(TEXT("%.0f"), Health));
 		//HealthTextComponent->SetText(Text);
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.5f, FColor::Red, 
-			Text.ToString());
+		/*GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.5f, FColor::Red, 
+			Text.ToString());*/
 }
 
 void AGGBaseCharacter::OnGroundeLanded(const FHitResult& Hit)
@@ -172,6 +178,8 @@ void AGGBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & Ou
 	//DOREPLIFETIME (AGGBaseCharacter, HealthComponent);
 	DOREPLIFETIME (AGGBaseCharacter, HealthTextComponent);
 	DOREPLIFETIME (AGGBaseCharacter, Text);
+	DOREPLIFETIME (AGGBaseCharacter, DeathAnimMontage);
+	DOREPLIFETIME (AGGBaseCharacter, bIsDead);
 }
 
   

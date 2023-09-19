@@ -52,8 +52,11 @@ void UGGHealthComponent::OnTakeDamage
 	
 		if (IsDead())
 		{
-			OnDeathEvent.Broadcast();
-		
+			if(GetOwnerRole() == ROLE_Authority)
+			{
+				UE_LOG(LogHealthComponent, Display, TEXT("Player %s is dead!"), *GetOwner()->GetName());
+				OnDeathEvent.Broadcast();
+			}
 		}
 		else if (AutoHeal)
 		{
@@ -76,7 +79,7 @@ void UGGHealthComponent::SetHealth(float NewHealth)
 		Health = FMath::Clamp(NewHealth, 0.0f , MaxHealth);
 		OnHealthChangedEvent.Broadcast(Health);
 		
-		UE_LOG(LogHealthComponent,Display,TEXT("Health Broadcast %f"), Health)
+		//UE_LOG(LogHealthComponent,Display,TEXT("Health Broadcast %f"), Health)
 }
 void UGGHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
 {
