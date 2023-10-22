@@ -5,6 +5,8 @@
 
 #include "GGBaseCharacter.h"
 #include "GGHealthComponent.h"
+#include "GGSpectator.h"
+
 
 DEFINE_LOG_CATEGORY_STATIC(FLogCategoryLogPlayerController, All, All);
 
@@ -32,15 +34,21 @@ void AGGPlayerController::BeginPlay()
 
 void AGGPlayerController::OnDeath()
 {
-	
 	if (HasAuthority())
 	{
-		ChangeState(NAME_Spectating);
+		//PlayerState->SetIsSpectator(true);
 		// avoid repeated calls on the server
+		
 		UE_LOG(FLogCategoryLogPlayerController, Display, TEXT("Player %s is SPECTATING!"), *GetName());
 		if (GetRemoteRole() == ROLE_AutonomousProxy)
 		{
-			ClientGotoState(NAME_Spectating);
+			//Не разобрался, как работать с дефолтным Спектейтором
+			//ChangeState(NAME_Spectating);
+			//ClientGotoState(NAME_Spectating);
+			
+			Possess(GetWorld()->SpawnActor<AGGSpectator>(
+				 AcknowledgedPawn->GetActorLocation(),
+				 AcknowledgedPawn->GetActorRotation()));
 		}
 	}
 }

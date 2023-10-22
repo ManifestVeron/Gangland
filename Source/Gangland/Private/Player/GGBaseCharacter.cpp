@@ -62,6 +62,7 @@ void AGGBaseCharacter::Tick(float DeltaTime)
 void AGGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	check(PlayerInputComponent);
 	// !!Change control to Enhanted Player Inpute and Enhanted Pleyer Component!! //
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGGBaseCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGGBaseCharacter::MoveRight);
@@ -133,12 +134,13 @@ void AGGBaseCharacter::OnDeath()
 		
 		GetCharacterMovement()->DisableMovement();
 
-		SetLifeSpan(LifeSpanOnDeath);
-	
 		/* Вынести в Tools потом. Возможно ли вызывать это в Player Contoller через делегат? 
 		auto const PC = Cast<AGGPlayerController>(GetOwner());
-		if(PC) PC->OnDeath();
+		if(PC) PC->GetSpectatorPawn()->SetActorLocationAndRotation(this->GetActorLocation(),this->GetActorRotation());
 		*/
+	
+		SetLifeSpan(LifeSpanOnDeath);
+		
 }
 //Death animations replications
 void AGGBaseCharacter::PlayAnimationDeath()
