@@ -7,7 +7,6 @@
 #include "GGHealthComponent.h"
 #include "GGSpectator.h"
 
-
 DEFINE_LOG_CATEGORY_STATIC(FLogCategoryLogPlayerController, All, All);
 
 AGGPlayerController::AGGPlayerController(const FObjectInitializer& ObjectInitializer)
@@ -29,7 +28,6 @@ void AGGPlayerController::BeginPlay()
 			Current_Character->GetHealthComponent()->OnDeathEvent.AddUObject(this, &AGGPlayerController::OnDeath);
 		}
 	});
-		
 }
 
 void AGGPlayerController::OnDeath()

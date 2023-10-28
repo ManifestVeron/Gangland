@@ -25,7 +25,8 @@ public class Gangland : ModuleRules
         {
             "Gangland/Public/Player",
             "Gangland/Public/Components",
-            "Gangland/Public/Dev"
+            "Gangland/Public/Dev",
+            "Gangland/Public/Weapon"
         });
 
         // Uncomment if you are using Slate UI

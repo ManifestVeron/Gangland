@@ -10,6 +10,7 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Weapon/GGBaseWeapon.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
 
@@ -48,6 +49,8 @@ void AGGBaseCharacter::BeginPlay()
 	HealthComponent->OnHealthChangedEvent.AddUObject(this, &AGGBaseCharacter::OnHealthChanged);
 
 	LandedDelegate.AddDynamic(this, &AGGBaseCharacter::OnGroundeLanded);
+
+	SpawnWeapon();
 }
 
 // Called every frame
@@ -172,6 +175,17 @@ void AGGBaseCharacter::OnGroundeLanded(const FHitResult& Hit)
 	TakeDamage(FallDamage, FDamageEvent(), nullptr, nullptr);
 
 	UE_LOG(LogBaseCharacter, Display, TEXT("Player %s recived landed damage %f"), *GetName(), FallDamage);
+}
+
+void AGGBaseCharacter::SpawnWeapon() const
+{
+	if(!GetWorld()) return;
+	const auto Weapon = GetWorld()->SpawnActor<AGGBaseWeapon>(WeaponClass);
+	if(Weapon)
+	{
+		FAttachmentTransformRules const AttachmentRules(EAttachmentRule::SnapToTarget, false);
+		Weapon->AttachToComponent(GetMesh(), AttachmentRules, "Weapon_Socket");
+	}
 }
 
 void AGGBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
