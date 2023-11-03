@@ -48,8 +48,14 @@ protected:
 	UPROPERTY(ReplicatedUsing = PlayAnimationDeath)
 	bool bIsDead;
 	
+	UPROPERTY(ReplicatedUsing = IsSomersault)
+	bool Somersault;
+	
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* DeathAnimMontage;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* SomersaultAnimMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float LifeSpanOnDeath = 5.0f;
@@ -80,7 +86,7 @@ public:
 	AGGBaseCharacter(const FObjectInitializer& ObjInit);
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
-	bool IsRunning() const;
+	FORCEINLINE bool IsRunning() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	FORCEINLINE float GetMovementDirection() const;
@@ -88,6 +94,9 @@ public:
 	//replication function for Death animation with bIsDead
 	UFUNCTION()
 	void PlayAnimationDeath();
+
+	UFUNCTION()
+	void IsSomersault();
 
 	UFUNCTION()
 	FORCEINLINE UGGHealthComponent* GetHealthComponent() const;
@@ -112,6 +121,9 @@ private:
 
 	void OnStartRunning();
 	void OnStopRunning();
+
+	void OnStartSomersault();
+	void OnStopSomersault();
 	
 	// !!Change control to Enhanted Player Inpute and Enhanted Pleyer Component!! /
 

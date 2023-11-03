@@ -76,6 +76,8 @@ void AGGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGGBaseCharacter::Jump);
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AGGBaseCharacter::OnStartRunning);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &AGGBaseCharacter::OnStopRunning);
+	PlayerInputComponent->BindAction("Somersault", IE_Pressed, this, &AGGBaseCharacter::OnStartSomersault);
+	PlayerInputComponent->BindAction("Somersault", IE_Released, this, &AGGBaseCharacter::OnStopSomersault);
 }
 
 void AGGBaseCharacter::MoveForward(float Amount)
@@ -110,6 +112,21 @@ void AGGBaseCharacter::OnStopRunning()
 bool AGGBaseCharacter::IsRunning() const
 {
 	return WantsToRun && IsMovingForward && !GetVelocity().IsZero();
+}
+
+void AGGBaseCharacter::OnStartSomersault()
+{
+	Somersault = true;
+}
+
+void AGGBaseCharacter::OnStopSomersault()
+{
+	Somersault = false;
+}
+
+void AGGBaseCharacter::IsSomersault()
+{
+	PlayAnimMontage(SomersaultAnimMontage);
 }
 
 // !!Change control to Enhanted Player Inpute and Enhanted Pleyer Component!! //
@@ -185,8 +202,8 @@ void AGGBaseCharacter::SpawnWeapon() const
 	const auto Weapon = GetWorld()->SpawnActor<AGGBaseWeapon>(WeaponClass);
 	if(Weapon)
 	{
-		FAttachmentTransformRules const AttachmentRules(EAttachmentRule::SnapToTarget, false);
-		Weapon->AttachToComponent(GetMesh(), AttachmentRules, "Weapon_Socket");
+		//FAttachmentTransformRules const AttachmentRules(EAttachmentRule::SnapToTarget, false);
+		//Weapon->AttachToComponent(GetMesh(), AttachmentRules, "Weapon_Socket");
 	}
 }
 
@@ -196,8 +213,10 @@ void AGGBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & Ou
 	//DOREPLIFETIME (AGGBaseCharacter, HealthComponent);
 	DOREPLIFETIME (AGGBaseCharacter, HealthTextComponent);
 	DOREPLIFETIME (AGGBaseCharacter, Text);
-	DOREPLIFETIME (AGGBaseCharacter, DeathAnimMontage);
 	DOREPLIFETIME (AGGBaseCharacter, bIsDead);
+	DOREPLIFETIME (AGGBaseCharacter, DeathAnimMontage);
+	DOREPLIFETIME (AGGBaseCharacter, Somersault);
+	DOREPLIFETIME (AGGBaseCharacter, SomersaultAnimMontage);
 }
 
   
