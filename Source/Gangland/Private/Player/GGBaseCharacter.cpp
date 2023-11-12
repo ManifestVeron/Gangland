@@ -77,7 +77,6 @@ void AGGBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AGGBaseCharacter::OnStartRunning);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &AGGBaseCharacter::OnStopRunning);
 	PlayerInputComponent->BindAction("Somersault", IE_Pressed, this, &AGGBaseCharacter::OnStartSomersault);
-	PlayerInputComponent->BindAction("Somersault", IE_Released, this, &AGGBaseCharacter::OnStopSomersault);
 }
 
 void AGGBaseCharacter::MoveForward(float Amount)
@@ -101,32 +100,69 @@ void AGGBaseCharacter::MoveRight(float Amount)
 
 void AGGBaseCharacter::OnStartRunning()
 {
-	WantsToRun = true;
+	bWantsToRun = true;
+	IsRunning(bWantsToRun);
 }
 
 void AGGBaseCharacter::OnStopRunning()
 {
-	WantsToRun = false;
+	bWantsToRun = false;
+	IsRunning(bWantsToRun);
 }
 
-bool AGGBaseCharacter::IsRunning() const
+void AGGBaseCharacter::IsRunning(bool running)
 {
-	return WantsToRun && IsMovingForward && !GetVelocity().IsZero();
+	bWantsToRun =  running && IsMovingForward && !GetVelocity().IsZero();
+	if(!GetOwner()->HasAuthority())
+	{
+		ServerIsRunning(bWantsToRun);
+	}
+}
+
+void AGGBaseCharacter::ServerIsRunning_Implementation(bool running)
+{
+	bWantsToRun = running;
+}
+
+bool AGGBaseCharacter:: Get_Running_for_Animation() const
+{
+	return bWantsToRun;
 }
 
 void AGGBaseCharacter::OnStartSomersault()
 {
-	Somersault = true;
+	bSomersault = true;
+	IsSomersault(bSomersault);
+	FTimerHandle Set_False_Somersault;
+	GetWorld()->GetTimerManager().SetTimer(Set_False_Somersault,
+		this,
+		&AGGBaseCharacter::OnStopSomersault,
+		1.0f,false,2.54f);
 }
 
 void AGGBaseCharacter::OnStopSomersault()
 {
-	Somersault = false;
+	bSomersault = false;
+	IsSomersault(bSomersault);
 }
 
-void AGGBaseCharacter::IsSomersault()
+void AGGBaseCharacter::IsSomersault(bool somersault)
 {
-	PlayAnimMontage(SomersaultAnimMontage);
+	bSomersault =  somersault;
+	if(!GetOwner()->HasAuthority())
+	{
+		ServerIsSomersault(bSomersault);
+	}
+}
+
+void AGGBaseCharacter::ServerIsSomersault_Implementation(bool somersault)
+{
+	bSomersault = somersault;
+}
+
+bool AGGBaseCharacter:: Get_Somersault_for_Animation() const
+{
+	return bSomersault;
 }
 
 // !!Change control to Enhanted Player Inpute and Enhanted Pleyer Component!! //
@@ -210,13 +246,13 @@ void AGGBaseCharacter::SpawnWeapon() const
 void AGGBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	//DOREPLIFETIME (AGGBaseCharacter, HealthComponent);
+
 	DOREPLIFETIME (AGGBaseCharacter, HealthTextComponent);
 	DOREPLIFETIME (AGGBaseCharacter, Text);
 	DOREPLIFETIME (AGGBaseCharacter, bIsDead);
 	DOREPLIFETIME (AGGBaseCharacter, DeathAnimMontage);
-	DOREPLIFETIME (AGGBaseCharacter, Somersault);
-	DOREPLIFETIME (AGGBaseCharacter, SomersaultAnimMontage);
+	DOREPLIFETIME (AGGBaseCharacter, bWantsToRun);
+	DOREPLIFETIME (AGGBaseCharacter, bSomersault);
 }
 
   

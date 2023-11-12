@@ -8,5 +8,5 @@ float UGGCharacterMovementComponent::GetMaxSpeed() const
 {
 	const AGGBaseCharacter* Player = Cast<AGGBaseCharacter>(GetPawnOwner());
 	const float MaxSpeed = Super::GetMaxSpeed();
-	return Player && Player->IsRunning() ? MaxSpeed * RunModifier : MaxSpeed;
+	return Player  ? MaxSpeed * RunModifier : MaxSpeed;
 }

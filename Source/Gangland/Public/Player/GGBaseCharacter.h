@@ -44,18 +44,9 @@ protected:
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	FText Text;
 	// <-Temp Health
-	//Replication variable
-	UPROPERTY(ReplicatedUsing = PlayAnimationDeath)
-	bool bIsDead;
-	
-	UPROPERTY(ReplicatedUsing = IsSomersault)
-	bool Somersault;
 	
 	UPROPERTY(Replicated, EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* DeathAnimMontage;
-
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* SomersaultAnimMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float LifeSpanOnDeath = 5.0f;
@@ -71,8 +62,17 @@ protected:
 
 private:
 	
-	bool WantsToRun = false;
 	bool IsMovingForward = false;
+
+	//Replication variable
+	UPROPERTY(ReplicatedUsing = PlayAnimationDeath)
+	bool bIsDead;
+	
+	UPROPERTY(Replicated)
+	bool bWantsToRun = false;
+
+	UPROPERTY(Replicated)
+	bool bSomersault = false;
 
 	//=================//
 	//	VARIABLES END
@@ -85,8 +85,17 @@ public:
 	// Sets default values for this character's properties
 	AGGBaseCharacter(const FObjectInitializer& ObjInit);
 
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	FORCEINLINE bool IsRunning() const;
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Running")
+	void ServerIsRunning(bool running);
+
+	UFUNCTION(BlueprintCallable, Category = "Running")
+	FORCEINLINE bool Get_Running_for_Animation() const;
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = "Running")
+	void ServerIsSomersault(bool somersault);
+
+	UFUNCTION(BlueprintCallable, Category = "Running")
+	FORCEINLINE bool Get_Somersault_for_Animation() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	FORCEINLINE float GetMovementDirection() const;
@@ -94,9 +103,6 @@ public:
 	//replication function for Death animation with bIsDead
 	UFUNCTION()
 	void PlayAnimationDeath();
-
-	UFUNCTION()
-	void IsSomersault();
 
 	UFUNCTION()
 	FORCEINLINE UGGHealthComponent* GetHealthComponent() const;
@@ -117,10 +123,14 @@ private:
 	void MoveForward(float Amount);
 	void MoveRight(float Amount);
 
-	// Run
+	// Running
 
 	void OnStartRunning();
 	void OnStopRunning();
+	
+	void IsRunning(bool running);
+	void IsSomersault(bool somersault);
+	
 
 	void OnStartSomersault();
 	void OnStopSomersault();
