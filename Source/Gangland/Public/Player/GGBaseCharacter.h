@@ -8,11 +8,11 @@
 
 #include "GGBaseCharacter.generated.h"
 
-class AGGBaseWeapon;
 class USpringArmComponent;
 class UCameraComponent;
 class UGGHealthComponent;
 class UTextRenderComponent;
+class UGGWeaponComponent;
 
 UCLASS()
 class GANGLAND_API AGGBaseCharacter : public ACharacter
@@ -37,6 +37,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UGGHealthComponent* HealthComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UGGWeaponComponent* WeaponComponent;
+
 	// Temp Health ->
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UTextRenderComponent* HealthTextComponent;
@@ -56,9 +59,6 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	FVector2D LandedDamage = FVector2D(10.0f, 100.0f);
-
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	TSubclassOf<AGGBaseWeapon> WeaponClass;
 
 private:
 	
@@ -144,8 +144,7 @@ private:
 	
 	// DELEGATES
 	void OnDeath();
-
-	void SpawnWeapon() const;
+	
 	//=================//
 	//	FUNCTIONS END
 };

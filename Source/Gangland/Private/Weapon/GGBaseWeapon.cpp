@@ -4,6 +4,8 @@
 #include "Weapon/GGBaseWeapon.h"
 #include "Components/SkeletalMeshComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All);
+
 // Sets default values
 AGGBaseWeapon::AGGBaseWeapon()
 {
@@ -18,7 +20,11 @@ AGGBaseWeapon::AGGBaseWeapon()
 void AGGBaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+}
+
+void AGGBaseWeapon::Fire()
+{
+	UE_LOG(LogBaseWeapon, Display, TEXT("Fire!"));
 }
 
 
